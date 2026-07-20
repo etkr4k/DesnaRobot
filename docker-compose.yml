@@ -6,7 +6,7 @@ services:
     ports:
       - "${HTTP_PORT:-9090}:80"
     environment:
-      - TRUSTED_PROXY_IP=${TRUSTED_PROXY_IP}
+      - TRUSTED_PROXY_IP=${TRUSTED_PROXY_IP:-127.0.0.1}
       - WEBHOOK_SITE=${WEBHOOK_SITE}
       - WEBHOOK_APP=${WEBHOOK_APP}
       - WEBHOOK_SCHEDULE_GET=${WEBHOOK_SCHEDULE_GET}
