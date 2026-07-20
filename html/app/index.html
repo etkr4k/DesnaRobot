@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Ключи на дом</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Geologica:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #181818;
+    --surface2: #222222;
+    --border: #2a2a2a;
+    --accent: #f0c040;
+    --accent2: #e8a020;
+    --text: #f0ede8;
+    --muted: #888;
+    --danger: #e05050;
+    --success: #4caf7d;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Geologica', sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    padding: 36px 24px 0;
+    position: relative;
+  }
+
+  .logo-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .logo-icon {
+    width: 38px; height: 38px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .brand {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .tagline {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 300;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  /* ── HERO STRIP ── */
+  .hero-strip {
+    margin: 24px 16px 0;
+    background: linear-gradient(135deg, #1e1a0e 0%, #1a1a1a 60%, #141410 100%);
+    border: 1px solid #3a3010;
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-strip::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(240,192,64,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-strip h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .hero-strip p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    padding: 28px 16px 0;
+  }
+
+  .section-label {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  /* ── PRICE CARD ── */
+  .price-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+
+  .price-row:last-child { border-bottom: none; }
+
+  .price-row-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .price-icon {
+    width: 36px; height: 36px;
+    background: var(--surface2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+
+  .price-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .price-desc {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+    margin-top: 1px;
+  }
+
+  .price-val {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    position: relative;
+  }
+
+  .step:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+  .step:last-child { border-bottom: 1px solid var(--border); border-radius: 0 0 var(--radius) var(--radius); }
+
+  .step-num {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    color: #0f0f0f;
+    border-radius: 50%;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-text {
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  .step-text strong {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .step-text span {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  /* ── CTA BUTTON ── */
+  .cta-wrap {
+    padding: 28px 16px 36px;
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(to top, var(--bg) 70%, transparent 100%);
+  }
+
+  .btn-cta {
+    width: 100%;
+    background: var(--accent);
+    color: #0f0f0f;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 18px 24px;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: transform 0.15s, opacity 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-cta:active { transform: scale(0.97); opacity: 0.9; }
+
+  /* ── MODAL OVERLAY ── */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+
+  .overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    width: 100%;
+    background: var(--surface);
+    border-radius: 24px 24px 0 0;
+    padding: 0 16px 40px;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+
+  .overlay.open .modal {
+    transform: translateY(0);
+  }
+
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 12px auto 20px;
+  }
+
+  .modal-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .modal-sub {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 300;
+    margin-bottom: 24px;
+  }
+
+  /* ── PAUSE BANNER ── */
+  .pause-banner {
+    display: none;
+    background: rgba(224,80,80,0.1);
+    border: 1px solid rgba(224,80,80,0.3);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .pause-banner.show { display: block; }
+
+  #formView.paused .field,
+  #formView.paused .qty-control,
+  #formView.paused .price-preview {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* ── FORM ── */
+  .field {
+    margin-bottom: 14px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  .field input, .field select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Geologica', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    padding: 13px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+
+  .field input:focus, .field select:focus {
+    border-color: var(--accent);
+  }
+
+  .field input.error, .field select.error {
+    border-color: var(--danger);
+  }
+
+  .field input::placeholder { color: #555; }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .qty-control {
+    display: flex;
+    align-items: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .qty-btn {
+    width: 48px; height: 48px;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 22px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+    font-family: 'Unbounded', sans-serif;
+    flex-shrink: 0;
+  }
+
+  .qty-btn:active { background: rgba(240,192,64,0.1); }
+
+  .qty-val {
+    flex: 1;
+    text-align: center;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* ── PRICE PREVIEW IN FORM ── */
+  .price-preview {
+    background: linear-gradient(135deg, #1e1a0e, #1a1a1a);
+    border: 1px solid #3a3010;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .price-preview-label {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .price-preview-val {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* ── CUSTOM DATETIME PICKER ── */
+  .datetime-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Geologica', sans-serif;
+    font-size: 15px;
+    padding: 13px 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s;
+  }
+
+  .datetime-trigger.active { border-color: var(--accent); }
+  .datetime-trigger.error { border-color: var(--danger); }
+
+  .calendar-popup {
+    display: none;
+    margin-top: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+  }
+
+  .calendar-popup.show { display: block; }
+
+  .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .calendar-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: capitalize;
+  }
+
+  .calendar-nav {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 30px; height: 30px;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 16px;
+  }
+
+  .calendar-nav:disabled { opacity: 0.3; pointer-events: none; }
+
+  .calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid transparent;
+  }
+
+  .calendar-day.empty { visibility: hidden; cursor: default; }
+  .calendar-day.disabled { color: var(--muted); background: none; cursor: not-allowed; opacity: 0.4; }
+  .calendar-day.selected { background: var(--accent); color: #0f0f0f; font-weight: 700; }
+
+  .calendar-slots {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .calendar-slots.empty::after {
+    content: 'Нет свободных слотов на этот день';
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .slot-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+
+  .slot-btn.selected { background: var(--accent); border-color: var(--accent); color: #0f0f0f; font-weight: 700; }
+
+  /* ── SUBMIT ── */
+  .btn-submit {
+    width: 100%;
+    background: var(--accent);
+    color: #0f0f0f;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 17px;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: transform 0.15s, opacity 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  .btn-submit:active { transform: scale(0.97); }
+  .btn-submit:disabled { opacity: 0.5; pointer-events: none; }
+
+  /* ── SUCCESS STATE ── */
+  .success-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px 0 10px;
+  }
+
+  .success-state.show { display: flex; }
+
+  .success-icon {
+    width: 72px; height: 72px;
+    background: rgba(76,175,125,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px;
+    margin-bottom: 16px;
+  }
+
+  .success-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .success-text {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.6;
+    max-width: 280px;
+  }
+
+  /* ── SPINNER ── */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-top-color: #0f0f0f;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(240,192,64,0.12);
+    border: 1px solid rgba(240,192,64,0.25);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-top: 10px;
+  }
+
+  .error-hint {
+    font-size: 11px;
+    color: var(--danger);
+    margin-top: 4px;
+    display: none;
+  }
+
+  .error-hint.show { display: block; }
+</style>
+<script src="/config.js"></script>
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=108207838', 'ym');
+
+    ym(108207838, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    ym(108207838, 'params', { source: 'tg_webapp' });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/108207838" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+</head>
+<body>
+
+<!-- ══ LANDING ══ -->
+<div id="landing">
+
+  <div class="header">
+    <div class="logo-line">
+      <div class="logo-icon">🗝</div>
+      <div class="brand">Ключи на дом</div>
+    </div>
+    <div class="tagline">Изготовление ключей для домофона<br>с выездом к вам</div>
+  </div>
+
+  <div class="hero-strip">
+    <h2>Не нужно никуда ехать</h2>
+    <p>Мастер приедет в удобное время и сделает дубликаты прямо на месте — без очередей и поездок в мастерскую.</p>
+    <div class="badge">📍 Работаем в районе: Десна</div>
+    <div class="badge">🕐 Каждый день 12:00–22:00</div>
+  </div>
+
+  <!-- PRICE -->
+  <div class="section">
+    <div class="section-label">Стоимость</div>
+    <div class="price-card">
+      <div class="price-row">
+        <div class="price-row-left">
+          <div class="price-icon">🔑</div>
+          <div>
+            <div class="price-name">1 ключ для домофона</div>
+            <div class="price-desc">Стандарты: Mifare, Em-Marine, Dallas<br>Изготовление за 2 минуты. Необходим оригинальный ключ.</div>
+          </div>
+        </div>
+        <div class="price-val">300 ₽</div>
+      </div>
+      <div class="price-row">
+        <div class="price-row-left">
+          <div class="price-icon">🔑</div>
+          <div>
+            <div class="price-name">От 3 ключей <span style="background:var(--accent);color:#0f0f0f;font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;margin-left:6px;vertical-align:middle;">Выгодно</span></div>
+            <div class="price-desc">Закажите сразу на всю семью — один выезд, один раз показать оригинал.</div>
+          </div>
+        </div>
+        <div class="price-val">200 ₽/шт</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="section">
+    <div class="section-label">Как это работает</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">
+          <strong>Оставляете заявку</strong>
+          <span>Указываете адрес, количество ключей и удобное время</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">
+          <strong>Мы подтверждаем</strong>
+          <span>Мы свяжемся с вами, чтобы уточнить детали и подтвердим визит</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          <strong>Мастер приезжает</strong>
+          <span>Делаем ключи прямо у вас. Оплата наличными или переводом на месте.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- IMPORTANT -->
+  <div class="section">
+    <div class="section-label">Важно знать</div>
+    <div style="background:var(--surface);border:1px solid rgba(76,175,125,0.25);border-radius:var(--radius);padding:18px;margin-bottom:10px;">
+      <div style="font-size:22px;margin-bottom:8px;">✅</div>
+      <div style="font-family:'Unbounded',sans-serif;font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;">Что нужно</div>
+      <div style="font-size:13px;color:var(--muted);font-weight:300;line-height:1.6;">Для изготовления дубликата необходим ваш <span style="color:var(--text);font-weight:500;">оригинальный ключ</span>. Без оригинала сделать копию невозможно. Дубликат полностью повторяет оригинал — куда пускает оригинал, туда пустит и дубликат.</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid rgba(224,80,80,0.25);border-radius:var(--radius);padding:18px;">
+      <div style="font-size:22px;margin-bottom:8px;">❌</div>
+      <div style="font-family:'Unbounded',sans-serif;font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;">Что не делаем</div>
+      <div style="font-size:13px;color:var(--muted);font-weight:300;line-height:1.6;">Мы не делаем <span style="color:var(--text);font-weight:500;">пульты от ворот паркинга</span> и <span style="color:var(--text);font-weight:500;">обычные ключи от квартирных дверей</span>. Только ключи для домофона.</div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-wrap">
+    <button class="btn-cta" onclick="openModal()">
+      Оставить заявку →
+    </button>
+  </div>
+
+</div>
+
+<!-- ══ MODAL ══ -->
+<div class="overlay" id="overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+
+    <!-- Form view -->
+    <div id="formView">
+      <div class="modal-title">Заявка на ключи</div>
+      <div class="modal-sub">Мастер свяжется с вами</div>
+
+      <div class="pause-banner" id="pauseBanner"></div>
+
+      <div class="field">
+        <label>Улица и дом</label>
+        <input type="text" id="street" placeholder="ул. Гренадерская, д. 9к3" autocomplete="street-address">
+        <div class="error-hint" id="streetErr">Укажите улицу и дом</div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Подъезд</label>
+          <input type="number" id="entrance" placeholder="1" min="1" max="99">
+        </div>
+        <div class="field">
+          <label>Этаж</label>
+          <input type="number" id="floor" placeholder="5" min="1" max="99">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Квартира</label>
+        <input type="number" id="apartment" placeholder="42" min="1">
+        <div class="error-hint" id="apartmentErr">Укажите номер квартиры</div>
+      </div>
+
+      <div class="field">
+        <label>Количество ключей</label>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <div class="qty-val" id="qtyVal">1</div>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+      </div>
+
+      <div class="price-preview">
+        <div class="price-preview-label">Итого к оплате</div>
+        <div class="price-preview-val" id="totalPrice">300 ₽</div>
+      </div>
+
+      <div class="field">
+        <label>Телефон</label>
+        <input type="tel" id="phone" placeholder="+7 (___) ___-__-__" autocomplete="tel">
+        <div class="error-hint" id="phoneErr">Укажите номер телефона</div>
+      </div>
+
+      <div class="field">
+        <label>Дата и время визита</label>
+        <button type="button" class="datetime-trigger" id="datetimeTrigger" onclick="toggleCalendar()">
+          <span id="datetimeTriggerText">Выберите дату и время</span>
+          <span>📅</span>
+        </button>
+        <input type="hidden" id="date">
+        <input type="hidden" id="time">
+        <div class="error-hint" id="dateErr">Выберите дату</div>
+        <div class="error-hint" id="timeErr">Выберите время</div>
+
+        <div class="calendar-popup" id="calendarPopup">
+          <div class="calendar-header">
+            <button type="button" class="calendar-nav" id="calPrev" onclick="calChangeMonth(-1)">‹</button>
+            <div class="calendar-title" id="calTitle"></div>
+            <button type="button" class="calendar-nav" onclick="calChangeMonth(1)">›</button>
+          </div>
+          <div class="calendar-weekdays">
+            <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+          </div>
+          <div class="calendar-grid" id="calGrid"></div>
+          <div class="calendar-slots" id="calSlots"></div>
+        </div>
+      </div>
+
+      <button class="btn-submit" id="submitBtn" onclick="submitForm()">
+        Отправить заявку
+      </button>
+    </div>
+
+    <!-- Success view -->
+    <div class="success-state" id="successView">
+      <div class="success-icon">✅</div>
+      <div class="success-title">Заявка принята!</div>
+      <div class="success-text">Мы свяжемся с вами для подтверждения. Спасибо!</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── Telegram WebApp init ──
+  const tg = window.Telegram?.WebApp;
+  if (!tg?.initData) {
+    window.location.href = '/';
+  }
+  if (tg) {
+    tg.ready();
+    tg.expand();
+    tg.setHeaderColor('#0f0f0f');
+    tg.setBackgroundColor('#0f0f0f');
+  }
+
+  // ── Config ──
+  const N8N_WEBHOOK = CONFIG.webhook_app;
+
+  // ── Pricing ──
+  function getPrice(qty) {
+    if (qty >= 3) return qty * 200;
+    return qty * 300;
+  }
+
+  // ── Qty ──
+  let qty = 1;
+
+  function changeQty(delta) {
+    qty = Math.max(1, Math.min(20, qty + delta));
+    document.getElementById('qtyVal').textContent = qty;
+    document.getElementById('totalPrice').textContent = getPrice(qty).toLocaleString('ru-RU') + ' ₽';
+  }
+
+  // ── Modal ──
+  function openModal() {
+    const overlay = document.getElementById('overlay');
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    const overlay = document.getElementById('overlay');
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('overlay')) closeModal();
+  }
+
+  // ── Validation ──
+  function showErr(fieldId, errId, show) {
+    document.getElementById(fieldId).classList.toggle('error', show);
+    document.getElementById(errId).classList.toggle('show', show);
+  }
+
+  function validatePhone(val) {
+    return val.replace(/\D/g, '').length >= 10;
+  }
+
+  // ── Phone mask ──
+  document.getElementById('phone').addEventListener('input', function(e) {
+    let val = e.target.value.replace(/\D/g, '');
+    if (val.startsWith('8')) val = '7' + val.slice(1);
+    if (val.length > 0 && !val.startsWith('7')) val = '7' + val;
+    val = val.slice(0, 11);
+    let masked = '';
+    if (val.length > 0) masked = '+' + val[0];
+    if (val.length > 1) masked += ' (' + val.slice(1, 4);
+    if (val.length >= 4) masked += ') ' + val.slice(4, 7);
+    if (val.length >= 7) masked += '-' + val.slice(7, 9);
+    if (val.length >= 9) masked += '-' + val.slice(9, 11);
+    e.target.value = masked;
+  });
+
+  // ── Schedule ──
+  const WEEKDAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
+  const SCHEDULE_FALLBACK = {
+    accepting_orders: true,
+    pause_message: '',
+    slot_step_minutes: 60,
+    min_lead_hours: 0,
+    weekly: {
+      mon: { open: true, start: '12:00', end: '22:00' },
+      tue: { open: true, start: '12:00', end: '22:00' },
+      wed: { open: true, start: '12:00', end: '22:00' },
+      thu: { open: true, start: '12:00', end: '22:00' },
+      fri: { open: true, start: '12:00', end: '22:00' },
+      sat: { open: true, start: '12:00', end: '22:00' },
+      sun: { open: true, start: '12:00', end: '22:00' }
+    },
+    exceptions: [],
+    blocked_slots: []
+  };
+
+  let schedule = SCHEDULE_FALLBACK;
+  let calViewDate = new Date();
+  let selectedDate = null;
+  let selectedTime = null;
+
+  function formatDateISO(date) {
+    return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+  }
+
+  function dayScheduleFor(date) {
+    const iso = formatDateISO(date);
+    const exception = schedule.exceptions.find(e => e.date === iso);
+    if (exception) return exception;
+    return schedule.weekly[WEEKDAY_KEYS[date.getDay()]] || { open: false };
+  }
+
+  function isSlotBlocked(date, slotStart, slotEnd) {
+    const iso = formatDateISO(date);
+    return schedule.blocked_slots.some(b => {
+      if (b.date !== iso) return false;
+      const [bStartH, bStartM] = (b.start || '00:00').split(':').map(Number);
+      const [bEndH, bEndM] = (b.end || '00:00').split(':').map(Number);
+      const bStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), bStartH, bStartM);
+      const bEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), bEndH, bEndM);
+      return slotStart < bEnd && slotEnd > bStart;
+    });
+  }
+
+  async function loadSchedule() {
+    if (CONFIG.webhook_schedule_get) {
+      try {
+        const resp = await fetch(CONFIG.webhook_schedule_get);
+        if (!resp.ok) throw new Error('bad status');
+        const data = await resp.json();
+        schedule = Object.assign({}, SCHEDULE_FALLBACK, data, {
+          weekly: Object.assign({}, SCHEDULE_FALLBACK.weekly, data.weekly || {}),
+          exceptions: Array.isArray(data.exceptions) ? data.exceptions : [],
+          blocked_slots: Array.isArray(data.blocked_slots) ? data.blocked_slots : []
+        });
+      } catch (err) {
+        schedule = SCHEDULE_FALLBACK;
+      }
+    }
+    applySchedule();
+  }
+
+  function applySchedule() {
+    const banner = document.getElementById('pauseBanner');
+    const formView = document.getElementById('formView');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (!schedule.accepting_orders) {
+      banner.textContent = schedule.pause_message || 'Сейчас не принимаем новые заявки.';
+      banner.classList.add('show');
+      formView.classList.add('paused');
+      submitBtn.disabled = true;
+    } else {
+      banner.classList.remove('show');
+      formView.classList.remove('paused');
+      submitBtn.disabled = false;
+    }
+
+    if (!selectedDate) initDefaultSelection();
+    renderCalendar();
+  }
+
+  function initDefaultSelection() {
+    const from = new Date();
+    from.setDate(from.getDate() + 1);
+    for (let i = 0; i < 60; i++) {
+      const check = new Date(from.getFullYear(), from.getMonth(), from.getDate() + i);
+      if (dayScheduleFor(check).open) {
+        selectedDate = check;
+        document.getElementById('date').value = formatDateISO(check);
+        calViewDate = new Date(check.getFullYear(), check.getMonth(), 1);
+        break;
+      }
+    }
+    updateTriggerText();
+  }
+
+  // ── Calendar popup ──
+  function toggleCalendar(forceOpen) {
+    const popup = document.getElementById('calendarPopup');
+    const trigger = document.getElementById('datetimeTrigger');
+    const show = forceOpen !== undefined ? forceOpen : !popup.classList.contains('show');
+    popup.classList.toggle('show', show);
+    trigger.classList.toggle('active', show);
+  }
+
+  document.addEventListener('click', (e) => {
+    const popup = document.getElementById('calendarPopup');
+    const trigger = document.getElementById('datetimeTrigger');
+    if (!popup.contains(e.target) && !trigger.contains(e.target)) toggleCalendar(false);
+  });
+
+  function calChangeMonth(delta) {
+    calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() + delta, 1);
+    renderCalendar();
+  }
+
+  function renderCalendar() {
+    const grid = document.getElementById('calGrid');
+    const title = document.getElementById('calTitle');
+    grid.innerHTML = '';
+
+    const year = calViewDate.getFullYear();
+    const month = calViewDate.getMonth();
+    title.textContent = calViewDate.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+
+    const firstDay = new Date(year, month, 1);
+    const startOffset = (firstDay.getDay() + 6) % 7;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const now = new Date();
+    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    for (let i = 0; i < startOffset; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'calendar-day empty';
+      grid.appendChild(cell);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const cell = document.createElement('div');
+      cell.className = 'calendar-day';
+      cell.textContent = day;
+
+      const closed = !dayScheduleFor(date).open || date < todayMidnight;
+      if (closed) {
+        cell.classList.add('disabled');
+      } else {
+        cell.addEventListener('click', () => selectDate(date));
+      }
+      if (selectedDate && formatDateISO(date) === formatDateISO(selectedDate)) cell.classList.add('selected');
+      grid.appendChild(cell);
+    }
+
+    document.getElementById('calPrev').disabled = (year === now.getFullYear() && month === now.getMonth());
+    renderSlots();
+  }
+
+  function selectDate(date) {
+    selectedDate = date;
+    selectedTime = null;
+    document.getElementById('date').value = formatDateISO(date);
+    document.getElementById('time').value = '';
+    renderCalendar();
+    updateTriggerText();
+  }
+
+  function renderSlots() {
+    const wrap = document.getElementById('calSlots');
+    wrap.innerHTML = '';
+    if (!selectedDate) return;
+
+    const daySched = dayScheduleFor(selectedDate);
+    if (!daySched.open) return;
+
+    const step = schedule.slot_step_minutes || 60;
+    const [startH, startM] = (daySched.start || '12:00').split(':').map(Number);
+    const [endH, endM] = (daySched.end || '22:00').split(':').map(Number);
+    const minAllowed = new Date(Date.now() + (schedule.min_lead_hours || 0) * 3600000);
+
+    let cursor = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), startH, startM);
+    const end = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), endH, endM);
+    let any = false;
+
+    while (cursor < end) {
+      const slotEnd = new Date(cursor.getTime() + step * 60000);
+      if (cursor >= minAllowed && !isSlotBlocked(selectedDate, cursor, slotEnd)) {
+        any = true;
+        const label = String(cursor.getHours()).padStart(2, '0') + ':' + String(cursor.getMinutes()).padStart(2, '0');
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'slot-btn' + (selectedTime === label ? ' selected' : '');
+        btn.textContent = label;
+        btn.addEventListener('click', () => selectTime(label));
+        wrap.appendChild(btn);
+      }
+      cursor = slotEnd;
+    }
+
+    wrap.classList.toggle('empty', !any);
+  }
+
+  function selectTime(label) {
+    selectedTime = label;
+    document.getElementById('time').value = label;
+    renderSlots();
+    updateTriggerText();
+    toggleCalendar(false);
+  }
+
+  function updateTriggerText() {
+    const el = document.getElementById('datetimeTriggerText');
+    if (!selectedDate) { el.textContent = 'Выберите дату и время'; return; }
+    const dateLabel = selectedDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+    el.textContent = selectedTime ? dateLabel + ', ' + selectedTime : dateLabel + ' — выберите время';
+  }
+
+  // ── Submit ──
+  async function submitForm() {
+    if (!schedule.accepting_orders) return;
+
+    const street = document.getElementById('street').value.trim();
+    const entrance = document.getElementById('entrance').value.trim();
+    const floor = document.getElementById('floor').value.trim();
+    const apartment = document.getElementById('apartment').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const date = document.getElementById('date').value;
+    const time = document.getElementById('time').value;
+
+    let valid = true;
+
+    if (!street) { showErr('street', 'streetErr', true); valid = false; }
+    else showErr('street', 'streetErr', false);
+
+    if (!apartment) { showErr('apartment', 'apartmentErr', true); valid = false; }
+    else showErr('apartment', 'apartmentErr', false);
+
+    if (!validatePhone(phone)) { showErr('phone', 'phoneErr', true); valid = false; }
+    else showErr('phone', 'phoneErr', false);
+
+    const dtTrigger = document.getElementById('datetimeTrigger');
+    if (!date || !time) {
+      dtTrigger.classList.add('error');
+      document.getElementById('dateErr').classList.toggle('show', !date);
+      document.getElementById('timeErr').classList.toggle('show', !!date && !time);
+      valid = false;
+    } else {
+      dtTrigger.classList.remove('error');
+      document.getElementById('dateErr').classList.remove('show');
+      document.getElementById('timeErr').classList.remove('show');
+    }
+
+    if (!valid) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div>';
+
+    const tgUser = tg?.initDataUnsafe?.user;
+
+    const addressParts = [street, entrance ? `подъезд ${entrance}` : '', floor ? `этаж ${floor}` : '', apartment ? `кв. ${apartment}` : ''].filter(Boolean).join(', ');
+
+    const payload = {
+      street,
+      entrance: entrance || null,
+      floor: floor || null,
+      apartment,
+      address_full: addressParts,
+      qty,
+      phone,
+      date,
+      time,
+      total_price: getPrice(qty),
+      tg_user_id: tgUser?.id ?? null,
+      tg_username: tgUser?.username ?? null,
+      tg_first_name: tgUser?.first_name ?? null,
+      source: 'tg_webapp',
+      created_at: new Date().toISOString()
+    };
+
+    try {
+      const resp = await fetch(N8N_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!resp.ok) throw new Error('Server error');
+
+      document.getElementById('formView').style.display = 'none';
+      document.getElementById('successView').classList.add('show');
+
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = 'Отправить заявку';
+      alert('Ошибка при отправке. Попробуйте ещё раз.');
+    }
+  }
+
+  loadSchedule();
+</script>
+</body>
+</html>
