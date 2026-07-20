@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Расписание — админка</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --radius: 16px;
+    --radius-sm: 10px;
+    --accent: #e8a800;
+    --accent-hover: #d09600;
+    --accent-fg: #0f0f0f;
+    --success: #3d9e68;
+    --danger: #d94f4f;
+    --transition: 0.2s ease;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f5f3ef;
+      --surface: #ffffff;
+      --surface2: #f0ede8;
+      --border: #e0dbd2;
+      --text: #1a1814;
+      --text2: #5a5650;
+      --muted: #9a9590;
+      --shadow: 0 2px 16px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111010;
+      --surface: #1c1b1a;
+      --surface2: #242220;
+      --border: #2e2c29;
+      --text: #f0ede8;
+      --text2: #b0ada8;
+      --muted: #706d68;
+      --shadow: 0 2px 16px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2);
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Geologica', sans-serif;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  nav {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+  }
+
+  .status-bar {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 18px;
+    min-height: 18px;
+  }
+
+  .status-bar.ok { color: var(--success); }
+  .status-bar.error { color: var(--danger); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .switch-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-bottom: 16px;
+    cursor: pointer;
+  }
+
+  .switch-row input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  input[type="text"], input[type="number"], input[type="date"], input[type="time"], textarea, select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Geologica', sans-serif;
+    font-size: 14px;
+    padding: 10px 12px;
+    outline: none;
+  }
+
+  input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+
+  textarea { resize: vertical; }
+
+  .weekly-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr auto 1fr;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .weekly-row:last-child { border-bottom: none; }
+
+  .weekly-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .weekly-check input { width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; }
+
+  .weekly-dash { text-align: center; color: var(--muted); }
+
+  .exception-row {
+    display: grid;
+    grid-template-columns: 1fr auto 0.8fr auto 0.8fr 1.2fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .exception-row:last-child { border-bottom: none; }
+
+  .exOpenLabel { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .exOpenLabel input { width: 16px; height: 16px; accent-color: var(--accent); }
+
+  .exRemove, .blockedRemove {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--danger);
+    width: 30px; height: 30px;
+    cursor: pointer;
+  }
+
+  .blocked-row {
+    display: grid;
+    grid-template-columns: 1fr 0.8fr auto 0.8fr 1.2fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .blocked-row:last-child { border-bottom: none; }
+
+  .empty-hint { font-size: 13px; color: var(--muted); padding: 4px 0 12px; }
+
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text2);
+    font-size: 13px;
+    padding: 10px 16px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-save {
+    width: 100%;
+    background: var(--accent);
+    color: var(--accent-fg);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 16px;
+    cursor: pointer;
+  }
+
+  .btn-save:hover { background: var(--accent-hover); }
+  .btn-save:disabled { opacity: 0.5; pointer-events: none; }
+
+  @media (max-width: 560px) {
+    .weekly-row { grid-template-columns: 1fr; row-gap: 6px; }
+    .exception-row, .blocked-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+<script src="/admin/config.js"></script>
+</head>
+<body>
+
+<nav>Расписание — Ключи на дом</nav>
+
+<div class="wrap">
+  <div class="status-bar" id="statusBar"></div>
+
+  <div class="card">
+    <div class="card-title">Приём заказов</div>
+    <label class="switch-row">
+      <span>Принимаем новые заявки</span>
+      <input type="checkbox" id="acceptingOrders" checked>
+    </label>
+    <div class="field">
+      <label>Текст баннера при паузе</label>
+      <textarea id="pauseMessage" rows="2"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Рабочие часы по дням недели</div>
+    <div id="weeklyRows"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Слоты записи</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Шаг слота</label>
+        <select id="slotStep">
+          <option value="15">15 минут</option>
+          <option value="30">30 минут</option>
+          <option value="60">60 минут</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Мин. время до визита, ч</label>
+        <input type="number" id="minLead" min="0" max="72">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Исключения (выходные / особые часы)</div>
+    <div id="exceptionsList"></div>
+    <button class="btn-ghost" id="addExceptionBtn" type="button">+ Добавить дату</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Занятые интервалы (обед, разовая занятость)</div>
+    <div id="blockedSlotsList"></div>
+    <button class="btn-ghost" id="addBlockedSlotBtn" type="button">+ Добавить интервал</button>
+  </div>
+
+  <button class="btn-save" id="saveBtn">Сохранить расписание</button>
+</div>
+
+<script>
+  const WEEKDAYS = [
+    { key: 'mon', label: 'Понедельник' },
+    { key: 'tue', label: 'Вторник' },
+    { key: 'wed', label: 'Среда' },
+    { key: 'thu', label: 'Четверг' },
+    { key: 'fri', label: 'Пятница' },
+    { key: 'sat', label: 'Суббота' },
+    { key: 'sun', label: 'Воскресенье' }
+  ];
+
+  const DEFAULT_WEEKLY = Object.fromEntries(WEEKDAYS.map(d => [d.key, { open: true, start: '12:00', end: '22:00' }]));
+
+  let state = {
+    accepting_orders: true,
+    pause_message: 'Сейчас не принимаем новые заявки. Загляните позже!',
+    slot_step_minutes: 60,
+    min_lead_hours: 2,
+    weekly: DEFAULT_WEEKLY,
+    exceptions: [],
+    blocked_slots: []
+  };
+
+  function setStatus(text, kind) {
+    const el = document.getElementById('statusBar');
+    el.textContent = text;
+    el.className = 'status-bar' + (kind ? ' ' + kind : '');
+  }
+
+  function esc(str) {
+    return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function renderWeekly() {
+    const wrap = document.getElementById('weeklyRows');
+    wrap.innerHTML = '';
+    WEEKDAYS.forEach(d => {
+      const day = state.weekly[d.key] || { open: false, start: '12:00', end: '22:00' };
+      const row = document.createElement('div');
+      row.className = 'weekly-row';
+      row.innerHTML =
+        '<label class="weekly-check"><input type="checkbox" class="dayOpen" ' + (day.open ? 'checked' : '') + '>' + d.label + '</label>' +
+        '<input type="time" class="dayStart" value="' + esc(day.start || '12:00') + '" ' + (day.open ? '' : 'disabled') + '>' +
+        '<span class="weekly-dash">—</span>' +
+        '<input type="time" class="dayEnd" value="' + esc(day.end || '22:00') + '" ' + (day.open ? '' : 'disabled') + '>';
+
+      row.querySelector('.dayOpen').addEventListener('change', e => {
+        state.weekly[d.key] = state.weekly[d.key] || { start: '12:00', end: '22:00' };
+        state.weekly[d.key].open = e.target.checked;
+        renderWeekly();
+      });
+      row.querySelector('.dayStart').addEventListener('input', e => { state.weekly[d.key].start = e.target.value; });
+      row.querySelector('.dayEnd').addEventListener('input', e => { state.weekly[d.key].end = e.target.value; });
+
+      wrap.appendChild(row);
+    });
+  }
+
+  function renderExceptions() {
+    const wrap = document.getElementById('exceptionsList');
+    wrap.innerHTML = '';
+    if (!state.exceptions.length) {
+      wrap.innerHTML = '<div class="empty-hint">Исключений нет</div>';
+      return;
+    }
+    state.exceptions.forEach((ex, idx) => {
+      const row = document.createElement('div');
+      row.className = 'exception-row';
+      row.innerHTML =
+        '<input type="date" class="exDate" value="' + esc(ex.date || '') + '">' +
+        '<label class="exOpenLabel"><input type="checkbox" class="exOpen" ' + (ex.open ? 'checked' : '') + '>Работаем</label>' +
+        '<input type="time" class="exStart" value="' + esc(ex.start || '12:00') + '" ' + (ex.open ? '' : 'disabled') + '>' +
+        '<span class="weekly-dash">—</span>' +
+        '<input type="time" class="exEnd" value="' + esc(ex.end || '22:00') + '" ' + (ex.open ? '' : 'disabled') + '>' +
+        '<input type="text" class="exNote" placeholder="Заметка">' +
+        '<button type="button" class="exRemove">✕</button>';
+
+      row.querySelector('.exNote').value = ex.note || '';
+      row.querySelector('.exDate').addEventListener('input', e => { ex.date = e.target.value; });
+      row.querySelector('.exOpen').addEventListener('change', e => { ex.open = e.target.checked; renderExceptions(); });
+      row.querySelector('.exStart').addEventListener('input', e => { ex.start = e.target.value; });
+      row.querySelector('.exEnd').addEventListener('input', e => { ex.end = e.target.value; });
+      row.querySelector('.exNote').addEventListener('input', e => { ex.note = e.target.value; });
+      row.querySelector('.exRemove').addEventListener('click', () => { state.exceptions.splice(idx, 1); renderExceptions(); });
+
+      wrap.appendChild(row);
+    });
+  }
+
+  function renderBlockedSlots() {
+    const wrap = document.getElementById('blockedSlotsList');
+    wrap.innerHTML = '';
+    if (!state.blocked_slots.length) {
+      wrap.innerHTML = '<div class="empty-hint">Занятых интервалов нет</div>';
+      return;
+    }
+    state.blocked_slots.forEach((slot, idx) => {
+      const row = document.createElement('div');
+      row.className = 'blocked-row';
+      row.innerHTML =
+        '<input type="date" class="bsDate" value="' + esc(slot.date || '') + '">' +
+        '<input type="time" class="bsStart" value="' + esc(slot.start || '15:00') + '">' +
+        '<span class="weekly-dash">—</span>' +
+        '<input type="time" class="bsEnd" value="' + esc(slot.end || '16:00') + '">' +
+        '<input type="text" class="bsNote" placeholder="Заметка">' +
+        '<button type="button" class="blockedRemove">✕</button>';
+
+      row.querySelector('.bsNote').value = slot.note || '';
+      row.querySelector('.bsDate').addEventListener('input', e => { slot.date = e.target.value; });
+      row.querySelector('.bsStart').addEventListener('input', e => { slot.start = e.target.value; });
+      row.querySelector('.bsEnd').addEventListener('input', e => { slot.end = e.target.value; });
+      row.querySelector('.bsNote').addEventListener('input', e => { slot.note = e.target.value; });
+      row.querySelector('.blockedRemove').addEventListener('click', () => { state.blocked_slots.splice(idx, 1); renderBlockedSlots(); });
+
+      wrap.appendChild(row);
+    });
+  }
+
+  function renderAll() {
+    document.getElementById('acceptingOrders').checked = !!state.accepting_orders;
+    document.getElementById('pauseMessage').value = state.pause_message || '';
+    document.getElementById('slotStep').value = String(state.slot_step_minutes || 60);
+    document.getElementById('minLead').value = state.min_lead_hours != null ? state.min_lead_hours : 2;
+    renderWeekly();
+    renderExceptions();
+    renderBlockedSlots();
+  }
+
+  document.getElementById('addExceptionBtn').addEventListener('click', () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    state.exceptions.push({ date: d.toISOString().split('T')[0], open: false, start: '12:00', end: '22:00', note: '' });
+    renderExceptions();
+  });
+
+  document.getElementById('addBlockedSlotBtn').addEventListener('click', () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    state.blocked_slots.push({ date: d.toISOString().split('T')[0], start: '15:00', end: '16:00', note: '' });
+    renderBlockedSlots();
+  });
+
+  document.getElementById('acceptingOrders').addEventListener('change', e => { state.accepting_orders = e.target.checked; });
+  document.getElementById('pauseMessage').addEventListener('input', e => { state.pause_message = e.target.value; });
+  document.getElementById('slotStep').addEventListener('change', e => { state.slot_step_minutes = Number(e.target.value); });
+  document.getElementById('minLead').addEventListener('input', e => { state.min_lead_hours = Number(e.target.value); });
+
+  async function loadSchedule() {
+    setStatus('Загрузка расписания…');
+    try {
+      const resp = await fetch(ADMIN_CONFIG.webhook_schedule_get);
+      if (!resp.ok) throw new Error('bad status');
+      const data = await resp.json();
+      state = {
+        accepting_orders: data.accepting_orders !== undefined ? data.accepting_orders : true,
+        pause_message: data.pause_message || state.pause_message,
+        slot_step_minutes: data.slot_step_minutes || 60,
+        min_lead_hours: data.min_lead_hours != null ? data.min_lead_hours : 2,
+        weekly: Object.assign({}, DEFAULT_WEEKLY, data.weekly || {}),
+        exceptions: Array.isArray(data.exceptions) ? data.exceptions : [],
+        blocked_slots: Array.isArray(data.blocked_slots) ? data.blocked_slots : []
+      };
+      renderAll();
+      setStatus('Расписание загружено', 'ok');
+    } catch (err) {
+      renderAll();
+      setStatus('Не удалось загрузить текущее расписание — заполните форму заново', 'error');
+    }
+  }
+
+  function validate() {
+    for (const d of WEEKDAYS) {
+      const day = state.weekly[d.key];
+      if (day.open && day.start >= day.end) {
+        return d.label + ': время начала должно быть раньше окончания';
+      }
+    }
+    for (const ex of state.exceptions) {
+      if (!ex.date) return 'Укажите дату для всех исключений';
+      if (ex.open && ex.start >= ex.end) return 'Исключение ' + ex.date + ': время начала должно быть раньше окончания';
+    }
+    for (const slot of state.blocked_slots) {
+      if (!slot.date) return 'Укажите дату для всех занятых интервалов';
+      if (slot.start >= slot.end) return 'Занятый интервал ' + slot.date + ': время начала должно быть раньше окончания';
+    }
+    return null;
+  }
+
+  async function saveSchedule() {
+    const error = validate();
+    if (error) { setStatus(error, 'error'); return; }
+
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    setStatus('Сохранение…');
+
+    try {
+      const resp = await fetch(ADMIN_CONFIG.webhook_schedule_set, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Token': ADMIN_CONFIG.admin_token
+        },
+        body: JSON.stringify(state)
+      });
+      if (!resp.ok) throw new Error('bad status');
+      setStatus('Сохранено ✓', 'ok');
+    } catch (err) {
+      setStatus('Ошибка при сохранении. Проверьте вебхук и токен в admin/config.js', 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', saveSchedule);
+
+  loadSchedule();
+</script>
+</body>
+</html>

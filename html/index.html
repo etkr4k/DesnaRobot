@@ -660,6 +660,148 @@
     font-weight: 400;
   }
 
+  /* ══ PAUSE BANNER ══ */
+  .pause-banner {
+    display: none;
+    background: rgba(217,79,79,0.08);
+    border: 1.5px solid rgba(217,79,79,0.3);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin-bottom: 22px;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .pause-banner.show { display: block; }
+
+  #formView.paused .field,
+  #formView.paused .qty-control,
+  #formView.paused .price-preview {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* ══ CUSTOM DATETIME PICKER ══ */
+  .datetime-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Geologica', sans-serif;
+    font-size: 15px;
+    padding: 13px 15px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+
+  .datetime-trigger.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,168,0,0.12); }
+  .datetime-trigger.error { border-color: var(--danger); }
+
+  .calendar-popup {
+    display: none;
+    margin-top: 10px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+  }
+
+  .calendar-popup.show { display: block; }
+
+  .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .calendar-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: capitalize;
+  }
+
+  .calendar-nav {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 30px; height: 30px;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 16px;
+  }
+
+  .calendar-nav:hover { border-color: var(--accent); color: var(--accent); }
+  .calendar-nav:disabled { opacity: 0.3; pointer-events: none; }
+
+  .calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    background: var(--surface2);
+    color: var(--text);
+    border: 1.5px solid transparent;
+  }
+
+  .calendar-day:hover { border-color: var(--accent); }
+  .calendar-day.empty { visibility: hidden; cursor: default; }
+  .calendar-day.disabled { color: var(--muted); background: none; cursor: not-allowed; opacity: 0.4; }
+  .calendar-day.disabled:hover { border-color: transparent; }
+  .calendar-day.selected { background: var(--accent); color: var(--accent-fg); font-weight: 700; }
+
+  .calendar-slots {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .calendar-slots.empty::after {
+    content: 'Нет свободных слотов на этот день';
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .slot-btn {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+
+  .slot-btn:hover { border-color: var(--accent); }
+  .slot-btn.selected { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); font-weight: 700; }
+
   /* ══ RESPONSIVE ══ */
   @media (max-width: 600px) {
     .form-card { padding: 24px 20px; }
@@ -787,6 +929,8 @@
       <div class="form-title">Оставить заявку</div>
       <div class="form-sub">Мастер свяжется с вами</div>
 
+      <div class="pause-banner" id="pauseBanner"></div>
+
       <!-- NAME -->
       <div class="field">
         <label>Как к вам обращаться</label>
@@ -843,16 +987,28 @@
       </div>
 
       <!-- DATE TIME -->
-      <div class="field-row">
-        <div class="field">
-          <label>Дата</label>
-          <input type="date" id="date">
-          <div class="error-hint" id="dateErr">Выберите дату</div>
-        </div>
-        <div class="field">
-          <label>Время</label>
-          <input type="time" id="time" min="08:00" max="22:00" value="12:00">
-          <div class="error-hint" id="timeErr">Выберите время</div>
+      <div class="field">
+        <label>Дата и время визита</label>
+        <button type="button" class="datetime-trigger" id="datetimeTrigger" onclick="toggleCalendar()">
+          <span id="datetimeTriggerText">Выберите дату и время</span>
+          <span>📅</span>
+        </button>
+        <input type="hidden" id="date">
+        <input type="hidden" id="time">
+        <div class="error-hint" id="dateErr">Выберите дату</div>
+        <div class="error-hint" id="timeErr">Выберите время</div>
+
+        <div class="calendar-popup" id="calendarPopup">
+          <div class="calendar-header">
+            <button type="button" class="calendar-nav" id="calPrev" onclick="calChangeMonth(-1)">‹</button>
+            <div class="calendar-title" id="calTitle"></div>
+            <button type="button" class="calendar-nav" onclick="calChangeMonth(1)">›</button>
+          </div>
+          <div class="calendar-weekdays">
+            <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+          </div>
+          <div class="calendar-grid" id="calGrid"></div>
+          <div class="calendar-slots" id="calSlots"></div>
         </div>
       </div>
 
@@ -886,14 +1042,227 @@
   // ЗАМЕНИ на реальный webhook URL из n8n (может быть тот же что у ТГ или отдельный)
   const N8N_WEBHOOK = CONFIG.webhook_site;
 
-  // ── Init date ──
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  const todayStr = today.toISOString().split('T')[0];
-  const tomorrowStr = tomorrow.toISOString().split('T')[0];
-  document.getElementById('date').setAttribute('min', todayStr);
-  document.getElementById('date').value = tomorrowStr;
+  // ── Schedule ──
+  const WEEKDAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
+  const SCHEDULE_FALLBACK = {
+    accepting_orders: true,
+    pause_message: '',
+    slot_step_minutes: 60,
+    min_lead_hours: 0,
+    weekly: {
+      mon: { open: true, start: '12:00', end: '22:00' },
+      tue: { open: true, start: '12:00', end: '22:00' },
+      wed: { open: true, start: '12:00', end: '22:00' },
+      thu: { open: true, start: '12:00', end: '22:00' },
+      fri: { open: true, start: '12:00', end: '22:00' },
+      sat: { open: true, start: '12:00', end: '22:00' },
+      sun: { open: true, start: '12:00', end: '22:00' }
+    },
+    exceptions: [],
+    blocked_slots: []
+  };
+
+  let schedule = SCHEDULE_FALLBACK;
+  let calViewDate = new Date();
+  let selectedDate = null;
+  let selectedTime = null;
+
+  function formatDateISO(date) {
+    return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+  }
+
+  function dayScheduleFor(date) {
+    const iso = formatDateISO(date);
+    const exception = schedule.exceptions.find(e => e.date === iso);
+    if (exception) return exception;
+    return schedule.weekly[WEEKDAY_KEYS[date.getDay()]] || { open: false };
+  }
+
+  async function loadSchedule() {
+    if (CONFIG.webhook_schedule_get) {
+      try {
+        const resp = await fetch(CONFIG.webhook_schedule_get);
+        if (!resp.ok) throw new Error('bad status');
+        const data = await resp.json();
+        schedule = Object.assign({}, SCHEDULE_FALLBACK, data, {
+          weekly: Object.assign({}, SCHEDULE_FALLBACK.weekly, data.weekly || {}),
+          exceptions: Array.isArray(data.exceptions) ? data.exceptions : [],
+          blocked_slots: Array.isArray(data.blocked_slots) ? data.blocked_slots : []
+        });
+      } catch (err) {
+        schedule = SCHEDULE_FALLBACK;
+      }
+    }
+    applySchedule();
+  }
+
+  function applySchedule() {
+    const banner = document.getElementById('pauseBanner');
+    const formView = document.getElementById('formView');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (!schedule.accepting_orders) {
+      banner.textContent = schedule.pause_message || 'Сейчас не принимаем новые заявки.';
+      banner.classList.add('show');
+      formView.classList.add('paused');
+      submitBtn.disabled = true;
+    } else {
+      banner.classList.remove('show');
+      formView.classList.remove('paused');
+      submitBtn.disabled = false;
+    }
+
+    if (!selectedDate) initDefaultSelection();
+    renderCalendar();
+  }
+
+  function initDefaultSelection() {
+    const from = new Date();
+    from.setDate(from.getDate() + 1);
+    for (let i = 0; i < 60; i++) {
+      const check = new Date(from.getFullYear(), from.getMonth(), from.getDate() + i);
+      if (dayScheduleFor(check).open) {
+        selectedDate = check;
+        document.getElementById('date').value = formatDateISO(check);
+        calViewDate = new Date(check.getFullYear(), check.getMonth(), 1);
+        break;
+      }
+    }
+    updateTriggerText();
+  }
+
+  // ── Calendar popup ──
+  function toggleCalendar(forceOpen) {
+    const popup = document.getElementById('calendarPopup');
+    const trigger = document.getElementById('datetimeTrigger');
+    const show = forceOpen !== undefined ? forceOpen : !popup.classList.contains('show');
+    popup.classList.toggle('show', show);
+    trigger.classList.toggle('active', show);
+  }
+
+  document.addEventListener('click', (e) => {
+    const popup = document.getElementById('calendarPopup');
+    const trigger = document.getElementById('datetimeTrigger');
+    if (!popup.contains(e.target) && !trigger.contains(e.target)) toggleCalendar(false);
+  });
+
+  function calChangeMonth(delta) {
+    calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() + delta, 1);
+    renderCalendar();
+  }
+
+  function renderCalendar() {
+    const grid = document.getElementById('calGrid');
+    const title = document.getElementById('calTitle');
+    grid.innerHTML = '';
+
+    const year = calViewDate.getFullYear();
+    const month = calViewDate.getMonth();
+    title.textContent = calViewDate.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+
+    const firstDay = new Date(year, month, 1);
+    const startOffset = (firstDay.getDay() + 6) % 7;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const now = new Date();
+    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    for (let i = 0; i < startOffset; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'calendar-day empty';
+      grid.appendChild(cell);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const cell = document.createElement('div');
+      cell.className = 'calendar-day';
+      cell.textContent = day;
+
+      const closed = !dayScheduleFor(date).open || date < todayMidnight;
+      if (closed) {
+        cell.classList.add('disabled');
+      } else {
+        cell.addEventListener('click', () => selectDate(date));
+      }
+      if (selectedDate && formatDateISO(date) === formatDateISO(selectedDate)) cell.classList.add('selected');
+      grid.appendChild(cell);
+    }
+
+    document.getElementById('calPrev').disabled = (year === now.getFullYear() && month === now.getMonth());
+    renderSlots();
+  }
+
+  function selectDate(date) {
+    selectedDate = date;
+    selectedTime = null;
+    document.getElementById('date').value = formatDateISO(date);
+    document.getElementById('time').value = '';
+    renderCalendar();
+    updateTriggerText();
+  }
+
+  function isSlotBlocked(date, slotStart, slotEnd) {
+    const iso = formatDateISO(date);
+    return schedule.blocked_slots.some(b => {
+      if (b.date !== iso) return false;
+      const [bStartH, bStartM] = (b.start || '00:00').split(':').map(Number);
+      const [bEndH, bEndM] = (b.end || '00:00').split(':').map(Number);
+      const bStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), bStartH, bStartM);
+      const bEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), bEndH, bEndM);
+      return slotStart < bEnd && slotEnd > bStart;
+    });
+  }
+
+  function renderSlots() {
+    const wrap = document.getElementById('calSlots');
+    wrap.innerHTML = '';
+    if (!selectedDate) return;
+
+    const daySched = dayScheduleFor(selectedDate);
+    if (!daySched.open) return;
+
+    const step = schedule.slot_step_minutes || 60;
+    const [startH, startM] = (daySched.start || '12:00').split(':').map(Number);
+    const [endH, endM] = (daySched.end || '22:00').split(':').map(Number);
+    const minAllowed = new Date(Date.now() + (schedule.min_lead_hours || 0) * 3600000);
+
+    let cursor = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), startH, startM);
+    const end = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), endH, endM);
+    let any = false;
+
+    while (cursor < end) {
+      const slotEnd = new Date(cursor.getTime() + step * 60000);
+      if (cursor >= minAllowed && !isSlotBlocked(selectedDate, cursor, slotEnd)) {
+        any = true;
+        const label = String(cursor.getHours()).padStart(2, '0') + ':' + String(cursor.getMinutes()).padStart(2, '0');
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'slot-btn' + (selectedTime === label ? ' selected' : '');
+        btn.textContent = label;
+        btn.addEventListener('click', () => selectTime(label));
+        wrap.appendChild(btn);
+      }
+      cursor = slotEnd;
+    }
+
+    wrap.classList.toggle('empty', !any);
+  }
+
+  function selectTime(label) {
+    selectedTime = label;
+    document.getElementById('time').value = label;
+    renderSlots();
+    updateTriggerText();
+    toggleCalendar(false);
+  }
+
+  function updateTriggerText() {
+    const el = document.getElementById('datetimeTriggerText');
+    if (!selectedDate) { el.textContent = 'Выберите дату и время'; return; }
+    const dateLabel = selectedDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+    el.textContent = selectedTime ? dateLabel + ', ' + selectedTime : dateLabel + ' — выберите время';
+  }
 
   // ── Scroll to form ──
   function scrollToForm() {
@@ -949,6 +1318,8 @@
 
   // ── Submit ──
   async function submitForm() {
+    if (!schedule.accepting_orders) return;
+
     const name      = document.getElementById('name').value.trim();
     const street    = document.getElementById('street').value.trim();
     const entrance  = document.getElementById('entrance').value.trim();
@@ -969,11 +1340,17 @@
     if (!validatePhone(phone)) { showErr('phone', 'phoneErr', true); valid = false; }
     else                         showErr('phone', 'phoneErr', false);
 
-    if (!date) { showErr('date', 'dateErr', true); valid = false; }
-    else         showErr('date', 'dateErr', false);
-
-    if (!time) { showErr('time', 'timeErr', true); valid = false; }
-    else         showErr('time', 'timeErr', false);
+    const dtTrigger = document.getElementById('datetimeTrigger');
+    if (!date || !time) {
+      dtTrigger.classList.add('error');
+      document.getElementById('dateErr').classList.toggle('show', !date);
+      document.getElementById('timeErr').classList.toggle('show', !!date && !time);
+      valid = false;
+    } else {
+      dtTrigger.classList.remove('error');
+      document.getElementById('dateErr').classList.remove('show');
+      document.getElementById('timeErr').classList.remove('show');
+    }
 
     if (!valid) return;
 
@@ -1017,6 +1394,8 @@
       alert('Ошибка при отправке. Попробуйте ещё раз.');
     }
   }
+
+  loadSchedule();
 </script>
 </body>
 </html>
