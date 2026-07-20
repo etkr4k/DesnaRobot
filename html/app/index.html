@@ -1013,7 +1013,23 @@
       submitBtn.disabled = false;
     }
 
+    if (!selectedDate) initDefaultSelection();
     renderCalendar();
+  }
+
+  function initDefaultSelection() {
+    const from = new Date();
+    from.setDate(from.getDate() + 1);
+    for (let i = 0; i < 60; i++) {
+      const check = new Date(from.getFullYear(), from.getMonth(), from.getDate() + i);
+      if (dayScheduleFor(check).open) {
+        selectedDate = check;
+        document.getElementById('date').value = formatDateISO(check);
+        calViewDate = new Date(check.getFullYear(), check.getMonth(), 1);
+        break;
+      }
+    }
+    updateTriggerText();
   }
 
   // ── Calendar popup ──
@@ -1067,7 +1083,7 @@
       if (closed) {
         cell.classList.add('disabled');
       } else {
-        cell.addEventListener('click', () => selectDate(date));
+        cell.addEventListener('click', (e) => { e.stopPropagation(); selectDate(date); });
       }
       if (selectedDate && formatDateISO(date) === formatDateISO(selectedDate)) cell.classList.add('selected');
       grid.appendChild(cell);
