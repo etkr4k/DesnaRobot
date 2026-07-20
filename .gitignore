@@ -1,2 +1,4 @@
 .htpasswd
+.env
+html/config.js
 html/admin/config.js

@@ -1,0 +1,5 @@
+const ADMIN_CONFIG = {
+  webhook_schedule_get: '${WEBHOOK_SCHEDULE_GET}',
+  webhook_schedule_set: '${WEBHOOK_SCHEDULE_SET}',
+  admin_token: '${ADMIN_TOKEN}'
+};

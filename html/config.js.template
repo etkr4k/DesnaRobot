@@ -1,0 +1,5 @@
+const CONFIG = {
+  webhook_site: '${WEBHOOK_SITE}',
+  webhook_app: '${WEBHOOK_APP}',
+  webhook_schedule_get: '${WEBHOOK_SCHEDULE_GET}'
+};

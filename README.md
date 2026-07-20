@@ -1,10 +1,17 @@
 # DesnaRobot
 
-`git clone https://github.com/etkr4k/DesnaRobot.git`
+```
+git clone https://github.com/etkr4k/DesnaRobot.git
+cd DesnaRobot
+cp .env.example .env
+nano .env
+docker run --rm httpd:alpine htpasswd -nb admin 'ВАШ_ПАРОЛЬ' > .htpasswd
+docker compose up --build -d
+```
 
-`cd DesnaRobot && nano html/config.js`
+Вся конфигурация — webhook-урлы, `admin_token`, IP реверс-прокси, порт — в одном `.env` (не коммитится, см. `.gitignore`). При старте контейнера `config.js` и `admin/config.js` генерируются автоматически из `.env` (шаблоны — `html/config.js.template`, `html/admin/config.js.template`), руками их не редактируйте — правки потеряются при следующем `docker compose up`.
 
-`docker compose up --build -d`
+Если меняете `.env` на уже запущенном проекте — перечитать его контейнер сам не сможет, нужно пересоздать: `docker compose up -d --force-recreate`.
 
 
 ```
@@ -76,25 +83,18 @@ INSERT INTO schedule_config (id) VALUES (1);
 Заведите два вебхука в n8n:
 
 - **GET `/webhook/schedule`** — публичный (его дёргает лендинг на каждой загрузке страницы). Один нод Postgres: `SELECT accepting_orders, pause_message, slot_step_minutes, min_lead_hours, weekly, exceptions, blocked_slots FROM schedule_config WHERE id = 1;` — и отдать результат как JSON-ответ.
-- **POST `/webhook/schedule`** — приватный, его дёргает `/admin`. Обязательно включите в ноде Webhook аутентификацию **Header Auth** (в n8n: Credential → Header Auth → имя заголовка `X-Admin-Token`, значение — ваш секрет) — то же значение секрета пропишите в `html/admin/config.js` (`admin_token`); страница шлёт его в заголовке `X-Admin-Token` при каждом сохранении. Без этого любой, кто узнает URL вебхука, сможет менять расписание в обход `/admin`. Тело запроса — тот же набор полей, что и в SELECT выше; нод Postgres делает `UPDATE schedule_config SET ... WHERE id = 1`.
+- **POST `/webhook/schedule`** — приватный, его дёргает `/admin`. Обязательно включите в ноде Webhook аутентификацию **Header Auth** (в n8n: Credential → Header Auth → имя заголовка `X-Admin-Token`, значение — ваш секрет) — то же значение впишите в `.env` (`ADMIN_TOKEN`); страница шлёт его в заголовке `X-Admin-Token` при каждом сохранении. Без этого любой, кто узнает URL вебхука, сможет менять расписание в обход `/admin`. Тело запроса — тот же набор полей, что и в SELECT выше; нод Postgres делает `UPDATE schedule_config SET ... WHERE id = 1`.
 
-Пропишите GET-URL в `html/config.js` (`webhook_schedule_get`). Для админки скопируйте шаблон и впишите оба URL и секрет:
-
-```
-cp html/admin/config.js.example html/admin/config.js
-nano html/admin/config.js
-```
-
-`html/admin/config.js` не коммитится (см. `.gitignore`), т.к. содержит реальный `admin_token` — секрет, а не просто адрес вебхука. Используйте длинный случайный токен, а не что-то предсказуемое.
+Все URL (`WEBHOOK_SITE`, `WEBHOOK_APP`, `WEBHOOK_SCHEDULE_GET`, `WEBHOOK_SCHEDULE_SET`) и `ADMIN_TOKEN` — в `.env`. Используйте длинный случайный токен, не оставляйте `CHANGE_ME`.
 
 Рекомендуется также добавить проверку `accepting_orders`/расписания в существующий workflow приёма заказов (перед вставкой в `orders`), чтобы расписание нельзя было обойти прямым POST на вебхук заказов, минуя лендинг.
 
 ### 3. Пароль для `/admin`
 
-Страница `/admin` защищена HTTP Basic Auth на уровне nginx. Сгенерируйте файл `.htpasswd` в корне проекта (он не коммитится, см. `.gitignore`):
+Страница `/admin` защищена HTTP Basic Auth на уровне nginx. Файл `.htpasswd` создаётся командой из шага установки выше (он не коммитится, см. `.gitignore`) и должен существовать до `docker compose up`, т.к. монтируется в контейнер.
 
-```
-docker run --rm httpd:alpine htpasswd -nb admin 'ВАШ_ПАРОЛЬ' > .htpasswd
-```
+### 4. Реальный IP клиента в логах (если nginx стоит за реверс-прокси)
+
+Если перед этим контейнером есть свой реверс-прокси (Caddy/другой nginx/Cloudflare и т.п.), в логах nginx по умолчанию будет виден IP прокси, а не реального клиента. Впишите в `.env` (`TRUSTED_PROXY_IP`) IP или подсеть этого прокси — один адрес (`1.2.3.4`) или подсеть (`1.2.3.0/24`). nginx подставит реальный IP клиента из заголовка `X-Forwarded-For`, который должен присылать ваш прокси. Не указывайте здесь ничего шире, чем реальный адрес прокси — иначе кто угодно сможет подделать IP в логах через свой собственный заголовок.
 
 Файл должен существовать до `docker compose up`, т.к. он монтируется в контейнер nginx.
